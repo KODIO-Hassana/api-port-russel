@@ -437,3 +437,8 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
     console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
 });
+
+// Route pour afficher la documentation
+app.get('/docs', (req, res) => {
+    res.render('docs');
+});
