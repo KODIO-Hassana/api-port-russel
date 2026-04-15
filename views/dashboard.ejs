@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord - Port de Russell</title>
+
+    <style>
+    body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+    
+    .add-catway-section {
+        background: #f4f4f4;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 40px; 
+        border: 1px solid #ddd;
+    }
+
+    form div { margin-bottom: 10px; }
+
+    label { display: inline-block; width: 100px; font-weight: bold; }
+
+    input, select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+
+    button { 
+        padding: 10px 20px; 
+        background: hsl(272, 100%, 50%); 
+        color: white; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+    }
+
+    button:hover { background: #0056b3; }
+
+    hr { border: 0; border-top: 2px solid #eee; margin: 40px 0; }
+
+    li {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        list-style: none;
+        display: flex;
+        align-items: center; /* Aligne le texte et les boutons proprement */
+    }
+
+    .btn-edit, .btn-reservations, .btn-delete {
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        margin-left: 10px;
+        color: white;
+        display: inline-block;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-reservations { background-color: #28a745; } 
+    .btn-edit { background-color: #007bff; }         
+    .btn-delete { background-color: hsl(341, 100%, 50%); }
+    </style>
+</head>
+<body>
+    <h1>Tableau de bord de la Capitainerie</h1>
+    <p>Connexion réussie ! Bienvenue sur votre espace sécurisé.</p>
+    
+    <hr>
+
+    <div class="add-catway-section">
+        <h2>Ajouter un nouveau Catway</h2>
+        <form action="/dashboard/add" method="POST">
+            <div>
+                <label>Numéro :</label>
+                <input type="number" name="catwayNumber" placeholder="Ex: 24" required>
+            </div>
+            <div>
+                <label>Type :</label>
+                <select name="catwayType" required>
+                    <option value="long">Long</option>
+                    <option value="short">Short</option>
+                </select>
+            </div>
+            <div>
+                <label>État :</label>
+                <input type="text" name="catwayState" placeholder="Ex: parfait état" required>
+            </div>
+            <button type="submit" style="background-color: green; margin-top: 10px;">Ajouter au port</button>
+        </form>
+    </div>
+    
+    <h2>Liste des Catways</h2>
+
+    <a href="/dashboard/reservations/all" style="display: inline-block; margin-bottom: 20px; text-decoration: none; background-color: #17a2b8; color: white; padding: 10px 15px; border-radius: 5px;">
+    📋 Voir toutes les réservations du port
+    </a>
+    
+    <% if (catways && catways.length > 0) { %>
+        <ul style="padding-left: 0;">
+            <% catways.forEach(function(catway) { %>
+            <li>
+                <span style="flex-grow: 1;">
+                    <strong>Catway n°<%= catway.catwayNumber %></strong> - 
+                    <%= catway.catwayType %> - <%= catway.catwayState %>
+                </span>
+
+                <a href="/dashboard/catways/<%= catway.catwayNumber %>/reservations" class="btn-reservations">Réservations</a>
+                <a href="/dashboard/edit/<%= catway._id %>" class="btn-edit">Modifier</a>
+                <button onclick="supprimerCatway('<%= catway._id %>')" class="btn-delete">Supprimer</button>
+            </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>Aucun catway n'a été trouvé dans la base de données.</p>
+    <% } %>
+
+    <hr>
+    <a href="/" style="color: #666;">Se déconnecter (Retour à l'accueil)</a>
+
+    <script>
+        async function supprimerCatway(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce Catway ? Toutes ses données seront perdues.")) {
+                // Remplace cette URL selon la façon dont ta route de suppression est codée dans app.js
+                // Exemple courant si c'est une méthode DELETE via Fetch :
+                try {
+                    const response = await fetch('/dashboard/delete/' + id, {
+                        method: 'DELETE' // ou 'GET' ou 'POST' selon ton backend
+                    });
+                    
+                    if (response.ok) {
+                        window.location.reload(); // Rafraîchit la page pour voir la disparition
+                    } else {
+                        alert("Erreur lors de la suppression.");
+                    }
+                } catch (err) {
+                    console.error("Erreur:", err);
+                    alert("Impossible de contacter le serveur.");
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

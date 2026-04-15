@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier le Catway <%= catway.catwayNumber %></title>
+</head>
+<body>
+    <h1>Modifier le Catway n°<%= catway.catwayNumber %></h1>
+    <hr>
+    <form action="/dashboard/update/<%= catway._id %>" method="POST">
+        <p><strong>Numéro :</strong> <%= catway.catwayNumber %> (Non modifiable)</p>
+        
+        <label>État actuel :</label><br>
+        <textarea name="catwayState" rows="4" cols="50" required><%= catway.catwayState %></textarea>
+        <br><br>
+        
+        <button type="submit" style="background-color: orange;">Enregistrer les modifications</button>
+        <a href="/dashboard">Annuler</a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservations - Catway <%= catwayNumber %></title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-box { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #eee; }
+        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #007bff; }
+    </style>
+</head>
+<body>
+
+    <!-- <a href="/dashboard" class="btn-back">⬅ Retour au tableau de bord</a> -->
+     <a href="/dashboard" style="display: inline-block; margin-bottom: 20px; text-decoration: none; background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 5px;">
+    ⬅ Retour au dashboard
+    </a>
+    <h1>Réservations pour le Catway n°<%= catwayNumber %></h1>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; margin-bottom: 30px;">
+    <h3 style="margin-top: 0; color: #333;">Nouvelle réservation</h3>
+    
+    <form action="/dashboard/catways/<%= catwayNumber %>/reservations/add" method="POST" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+        
+        <input type="text" name="clientName" placeholder="Nom du client" required 
+               style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px;">
+        
+        <input type="text" name="boatName" placeholder="Nom du bateau" required 
+               style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px;">
+        
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label style="font-weight: bold;">Arrivée :</label>
+            <input type="date" name="startDate" required style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label style="font-weight: bold;">Départ :</label>
+            <input type="date" name="endDate" required style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        
+        <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            Enregistrer
+        </button>
+    </form>
+</div>
+
+    <% if (reservations && reservations.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Bateau</th>
+                    <th>Arrivée</th>
+                    <th>Départ</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% reservations.forEach(function(resv) { %>
+                    <tr>
+                        <td><%= resv.clientName %></td>
+                        <td><%= resv.boatName %></td>
+                        <td><%= resv.startDate ? new Date(resv.startDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                        <td><%= resv.endDate ? new Date(resv.endDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                        <td>
+                            <button onclick="supprimerReservation('<%= resv._id %>')" 
+                                style="background-color: #dc3545; color: white; border: none;
+                                 padding: 5px 10px; border-radius: 4px; cursor: pointer;">Supprimer
+                             </button>
+                         </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>Aucune réservation enregistrée pour ce catway.</p>
+    <% } %>
+
+    <script>
+    async function supprimerReservation(id) {
+        if (confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) {
+            try {
+                const response = await fetch('/dashboard/reservations/delete/' + id, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    window.location.reload(); // Rafraîchit la page
+                } else {
+                    alert("Erreur lors de l'annulation.");
+                }
+            } catch (err) {
+                console.error("Erreur:", err);
+                alert("Impossible de contacter le serveur.");
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

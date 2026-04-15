@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Toutes les Réservations - Port de Plaisance</title>
+    <link rel="stylesheet" href="/css/style.css"> <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 2px solid #17a2b8; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #17a2b8; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; background-color: #6c757d; color: white; padding: 10px 15px; border-radius: 5px; }
+        .badge-catway { background-color: #e9ecef; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #495057; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/dashboard" class="btn-back">⬅ Retour au Tableau de Bord</a>
+
+    <h1>📋 Liste Globale des Réservations</h1>
+
+    <% if (reservations && reservations.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>N° Catway</th>
+                    <th>Nom du Client</th>
+                    <th>Nom du Bateau</th>
+                    <th>Date d'Arrivée</th>
+                    <th>Date de Départ</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% reservations.forEach(function(resv) { %>
+                    <tr>
+                        <td><span class="badge-catway">#<%= resv.catwayNumber %></span></td>
+                        <td><%= resv.clientName %></td>
+                        <td><%= resv.boatName %></td>
+                        <td><%= resv.startDate ? new Date(resv.startDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                        <td><%= resv.endDate ? new Date(resv.endDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                        <td>
+                             <button onclick="supprimerReservation('<%= resv._id %>')" style="background-color: #dc3545;
+                              color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"> Supprimer
+                              </button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p style="text-align: center; margin-top: 50px; color: #666;">
+            Aucune réservation n'est enregistrée dans la base de données.
+        </p>
+    <% } %>
+</div>
+
+<script>
+    async function supprimerReservation(id) {
+        if (confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) {
+            try {
+                // On appelle exactement la même route que tout à l'heure
+                const response = await fetch('/dashboard/reservations/delete/' + id, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    window.location.reload(); // Rafraîchit le tableau global
+                } else {
+                    alert("Erreur lors de l'annulation.");
+                }
+            } catch (err) {
+                console.error("Erreur:", err);
+                alert("Impossible de contacter le serveur.");
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
