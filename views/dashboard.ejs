@@ -5,7 +5,7 @@
     <title>Tableau de bord - Port de Russell</title>
 
     <style>
-    body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+    body { font-family: sans-serif; margin: 40px; line-height: 1.6; background-color: #f8f9fa; }
     
     .add-catway-section {
         background: #f4f4f4;
@@ -16,9 +16,7 @@
     }
 
     form div { margin-bottom: 10px; }
-
     label { display: inline-block; width: 100px; font-weight: bold; }
-
     input, select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
 
     button { 
@@ -29,7 +27,6 @@
         border-radius: 4px; 
         cursor: pointer; 
     }
-
     button:hover { background: #0056b3; }
 
     hr { border: 0; border-top: 2px solid #eee; margin: 40px 0; }
@@ -37,11 +34,12 @@
     li {
         margin-bottom: 15px;
         padding: 10px;
-        background-color: #f9f9f9;
+        background-color: #fff;
         border-radius: 5px;
         list-style: none;
         display: flex;
-        align-items: center; /* Aligne le texte et les boutons proprement */
+        align-items: center;
+        border: 1px solid #ddd;
     }
 
     .btn-edit, .btn-reservations, .btn-delete {
@@ -58,14 +56,60 @@
 
     .btn-reservations { background-color: #28a745; } 
     .btn-edit { background-color: #007bff; }         
-    .btn-delete { background-color: hsl(341, 100%, 50%); }
+    .btn-delete { background-color: #dc3545; }
     </style>
 </head>
 <body>
+
+    <header style="background: #0056b3; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div>
+            <h2 style="margin: 0;">👤 Bienvenue, <%= user.username %></h2>
+            <p style="margin: 5px 0 0 0; font-size: 1em;">✉️ <%= user.email %></p>
+        </div>
+        <div style="text-align: right; font-size: 1.2em; font-weight: bold;">
+            <span id="date-jour"></span>
+        </div>
+    </header>
+
+    <nav style="background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <a href="/dashboard" style="text-decoration: none; font-weight: bold; color: #0056b3;">🏠 Accueil / Tableau de bord</a>
+        <a href="/dashboard/users" style="text-decoration: none; font-weight: bold; color: #333;">👥 Gestion Utilisateurs</a>
+        <a href="/docs" style="text-decoration: none; font-weight: bold; color: #17a2b8;">📖 Documentation API</a>
+        <a href="/auth/logout" style="text-decoration: none; font-weight: bold; color: #dc3545; margin-left: auto;">🚪 Se déconnecter</a>
+    </nav>
+
     <h1>Tableau de bord de la Capitainerie</h1>
-    <p>Connexion réussie ! Bienvenue sur votre espace sécurisé.</p>
-    
     <hr>
+
+    <h2>📋 Réservations du port en cours</h2>
+    <div style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 40px; max-height: 300px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #343a40; color: white; text-align: left;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">N° Catway</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Client</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Bateau</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Arrivée</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Départ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (reservations && reservations.length > 0) { %>
+                    <% reservations.forEach(function(resv) { %>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 8px;"><span style="background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-weight: bold;">#<%= resv.catwayNumber %></span></td>
+                            <td style="padding: 8px;"><%= resv.clientName %></td>
+                            <td style="padding: 8px;"><%= resv.boatName %></td>
+                            <td style="padding: 8px;"><%= resv.startDate ? new Date(resv.startDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                            <td style="padding: 8px;"><%= resv.endDate ? new Date(resv.endDate).toLocaleDateString('fr-FR') : 'N/A' %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr><td colspan="5" style="padding: 10px; text-align: center; color: #666;">Aucune réservation n'est enregistrée.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 
     <div class="add-catway-section">
         <h2>Ajouter un nouveau Catway</h2>
@@ -85,15 +129,11 @@
                 <label>État :</label>
                 <input type="text" name="catwayState" placeholder="Ex: parfait état" required>
             </div>
-            <button type="submit" style="background-color: green; margin-top: 10px;">Ajouter au port</button>
+            <button type="submit" style="background-color: #28a745; margin-top: 10px;">Ajouter au port</button>
         </form>
     </div>
     
     <h2>Liste des Catways</h2>
-
-    <a href="/dashboard/reservations/all" style="display: inline-block; margin-bottom: 20px; text-decoration: none; background-color: #17a2b8; color: white; padding: 10px 15px; border-radius: 5px;">
-    📋 Voir toutes les réservations du port
-    </a>
     
     <% if (catways && catways.length > 0) { %>
         <ul style="padding-left: 0;">
@@ -101,10 +141,11 @@
             <li>
                 <span style="flex-grow: 1;">
                     <strong>Catway n°<%= catway.catwayNumber %></strong> - 
-                    <%= catway.catwayType %> - <%= catway.catwayState %>
+                    <span style="color: #666;"><%= catway.catwayType %></span> - 
+                    <em><%= catway.catwayState %></em>
                 </span>
 
-                <a href="/dashboard/catways/<%= catway.catwayNumber %>/reservations" class="btn-reservations">Réservations</a>
+                <a href="/dashboard/catways/<%= catway.catwayNumber %>/reservations" class="btn-reservations">Gérer Réservations</a>
                 <a href="/dashboard/edit/<%= catway._id %>" class="btn-edit">Modifier</a>
                 <button onclick="supprimerCatway('<%= catway._id %>')" class="btn-delete">Supprimer</button>
             </li>
@@ -114,21 +155,24 @@
         <p>Aucun catway n'a été trouvé dans la base de données.</p>
     <% } %>
 
-    <hr>
-    <a href="/" style="color: #666;">Se déconnecter (Retour à l'accueil)</a>
-
     <script>
+        // 1. Script pour afficher la date du jour en français
+        const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // Met la première lettre en majuscule pour faire plus joli
+        let dateString = new Date().toLocaleDateString('fr-FR', optionsDate);
+        dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+        document.getElementById('date-jour').textContent = "📅 " + dateString;
+
+        // 2. Script pour la suppression des catways
         async function supprimerCatway(id) {
             if (confirm("Êtes-vous sûr de vouloir supprimer ce Catway ? Toutes ses données seront perdues.")) {
-                // Remplace cette URL selon la façon dont ta route de suppression est codée dans app.js
-                // Exemple courant si c'est une méthode DELETE via Fetch :
                 try {
                     const response = await fetch('/dashboard/delete/' + id, {
-                        method: 'DELETE' // ou 'GET' ou 'POST' selon ton backend
+                        method: 'DELETE'
                     });
                     
                     if (response.ok) {
-                        window.location.reload(); // Rafraîchit la page pour voir la disparition
+                        window.location.reload(); 
                     } else {
                         alert("Erreur lors de la suppression.");
                     }

@@ -209,12 +209,33 @@ app.get('/dashboard/users', verifierAuthentification, async (req, res) => {
     }
 });
 
-// LA NOUVELLE ROUTE SÉCURISÉE
+// // LA NOUVELLE ROUTE SÉCURISÉE
+// app.get('/dashboard', verifierAuthentification, async (req, res) => {
+//     const Catway = require('./models/catway'); 
+//     try {
+//         const catways = await Catway.find().lean();
+//         res.render('dashboard', { catways: catways });
+//     } catch (error) {
+//         console.error("Erreur serveur :", error);
+//         res.status(500).send("Erreur lors du chargement du dashboard.");
+//     }
+// });
+
+// LA NOUVELLE ROUTE SÉCURISÉE DU DASHBOARD
 app.get('/dashboard', verifierAuthentification, async (req, res) => {
     const Catway = require('./models/catway'); 
+    const Reservation = require('./models/reservation'); // On a besoin des réservations ici aussi !
+    
     try {
         const catways = await Catway.find().lean();
-        res.render('dashboard', { catways: catways });
+        const reservations = await Reservation.find({}).sort({ startDate: 1 }).lean(); // On récupère les réservations
+        
+        // On rend la page en lui passant les catways, les réservations, ET l'utilisateur connecté (req.user)
+        res.render('dashboard', { 
+            catways: catways,
+            reservations: reservations,
+            user: req.user // Ces infos viennent de ton token (via verifierAuthentification) !
+        });
     } catch (error) {
         console.error("Erreur serveur :", error);
         res.status(500).send("Erreur lors du chargement du dashboard.");
