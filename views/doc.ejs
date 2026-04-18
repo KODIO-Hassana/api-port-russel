@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-    <a href="/" class="back-link">⬅ Retour à l'accueil</a>
+    <!-- <a href="/" class="back-link">⬅ Retour à l'accueil</a>
     <h1>📖 Documentation de l'API - Port de Russell</h1>
     <p>Cette documentation liste les points d'entrée (endpoints) disponibles pour gérer les ressources du port.</p>
 
@@ -60,6 +60,77 @@
 
     <footer style="margin-top: 50px; text-align: center; color: #888; font-size: 0.8em;">
         &copy; 2026 - Capitainerie de Russell - API Privée
+    </footer> -->
+
+     <a href="/" class="back-link">⬅ Retour à l'accueil</a>
+    <h1>📖 Documentation de l'API - Port de Russell</h1>
+    <p>Cette documentation liste les points d'entrée (endpoints) de l'API REST pure disponibles pour gérer les ressources du port via Postman ou une autre application.</p>
+
+    <h2>👤 Gestion des Utilisateurs</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/users/</span>
+        <div class="desc">Récupère la liste de tous les utilisateurs (mots de passe masqués).</div>
+    </div>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/users/:email</span>
+        <div class="desc">Récupère les détails d'un utilisateur spécifique via son email.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method post">POST</span> <span class="path">/users/</span>
+        <div class="desc">Crée un nouvel utilisateur. Reçoit : <code>username, email, password</code>.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method put">PUT</span> <span class="path">/users/:email</span>
+        <div class="desc">Modifie les informations d'un utilisateur spécifique.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method delete">DELETE</span> <span class="path">/users/:email</span>
+        <div class="desc">Supprime un utilisateur via son adresse email.</div>
+    </div>
+
+    <h2>⚓ Gestion des Catways</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/catways</span>
+        <div class="desc">Récupère tous les catways au format JSON.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/catways/:id</span>
+        <div class="desc">Récupère les détails d'un seul catway via son numéro.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method post">POST</span> <span class="path">/catways</span>
+        <div class="desc">Crée un nouveau catway. Reçoit : <code>catwayNumber, type, catwayState</code>.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method put">PUT</span> <span class="path">/catways/:id</span>
+        <div class="desc">Met à jour l'état d'un catway (catwayState).</div>
+    </div>
+    <div class="endpoint">
+        <span class="method delete">DELETE</span> <span class="path">/catways/:id</span>
+        <div class="desc">Supprime un catway via son numéro.</div>
+    </div>
+
+    <h2>📅 Gestion des Réservations</h2>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/catways/:id/reservations</span>
+        <div class="desc">Récupère la liste de toutes les réservations pour un catway spécifique.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method get">GET</span> <span class="path">/catways/:id/reservations/:idReservation</span>
+        <div class="desc">Récupère les détails d'une réservation précise.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method post">POST</span> <span class="path">/catways/:id/reservations</span>
+        <div class="desc">Crée une réservation pour un catway. Reçoit : <code>clientName, boatName, startDate, endDate</code>.</div>
+    </div>
+    <div class="endpoint">
+        <span class="method delete">DELETE</span> <span class="path">/catways/:id/reservations/:idReservation</span>
+        <div class="desc">Supprime une réservation spécifique via son identifiant unique.</div>
+    </div>
+
+    <footer style="margin-top: 50px; text-align: center; color: #888; font-size: 0.8em;">
+        &copy; 2026 - Capitainerie de Russell - API Privée
     </footer>
+
 </body>
 </html>

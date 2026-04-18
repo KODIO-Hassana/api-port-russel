@@ -1,4 +1,8 @@
 // 1. Chargement des variables d'environnement (.env)
+const User = require('./models/user');
+const Catway = require('./models/catway'); 
+const Reservation = require('./models/reservation'); // 
+
 require('dotenv').config();
 
 const cookieParser = require('cookie-parser');
@@ -12,8 +16,6 @@ const mongoose = require('mongoose');
 const app = express();
 
 const path = require('path');
-
-const Catway = require('./models/catway'); // Vérifie que le chemin correspond bien à ton dossier
 
 // Indique à Express qu'on utilise EJS pour générer le HTML
 app.set('view engine', 'ejs');
@@ -63,7 +65,7 @@ app.use('/users', usersRoutes);
 
 // 6. DÉFINITION DES ROUTES DE L'API
 app.use('/catways', catwaysRoutes);
-app.use('/reservations', reservationsRoutes);
+app.use('/', reservationsRoutes);
 app.use('/auth', authRoutes);
 
 // 7. CONNEXION À LA BASE DE DONNÉES MONGODB
@@ -199,7 +201,7 @@ app.get('/', (req, res) => {
 
 // AFFICHER LA PAGE DE GESTION DES UTILISATEURS
 app.get('/dashboard/users', verifierAuthentification, async (req, res) => {
-    const User = require('./models/user');
+    // const User = require('./models/user');
     try {
         // On récupère les utilisateurs sans leur mot de passe
         const usersList = await User.find().select('-password').lean();
@@ -223,8 +225,8 @@ app.get('/dashboard/users', verifierAuthentification, async (req, res) => {
 
 // LA NOUVELLE ROUTE SÉCURISÉE DU DASHBOARD
 app.get('/dashboard', verifierAuthentification, async (req, res) => {
-    const Catway = require('./models/catway'); 
-    const Reservation = require('./models/reservation'); // On a besoin des réservations ici aussi !
+    // const Catway = require('./models/catway'); 
+    // const Reservation = require('./models/reservation'); // On a besoin des réservations ici aussi !
     
     try {
         const catways = await Catway.find().lean();
@@ -244,7 +246,7 @@ app.get('/dashboard', verifierAuthentification, async (req, res) => {
 
 //Récupérer l'intégralité de la collection de la reservation
 app.get('/dashboard/reservations/all', verifierAuthentification, async (req, res) => {
-    const Reservation = require('./models/reservation');
+    // const Reservation = require('./models/reservation');
     try {
         // .find({}) sans rien dedans récupère TOUT
         const allReservations = await Reservation.find({}).sort({startDate: 1 }).lean();
@@ -263,7 +265,7 @@ app.get('/dashboard/reservations/all', verifierAuthentification, async (req, res
 
 // 1. AFFICHER la liste et le formulaire (Le GET)
 app.get('/dashboard/catways/:id/reservations', verifierAuthentification, async (req, res) => {
-    const Reservation = require('./models/reservation');
+    // const Reservation = require('./models/reservation');
     try {
         const catwayNumber = req.params.id;
         // On cherche toutes les réservations liées à ce numéro de catway
@@ -286,7 +288,7 @@ app.get('/dashboard/catways/:id/reservations', verifierAuthentification, async (
 
 // 2. ENREGISTRER une nouvelle réservation (Le POST)
 app.post('/dashboard/catways/:id/reservations/add', verifierAuthentification, async (req, res) => {
-    const Reservation = require('./models/reservation');
+    // const Reservation = require('./models/reservation');
     try {
         const nouvelleResa = new Reservation({
             catwayNumber: req.params.id,
@@ -308,7 +310,7 @@ app.post('/dashboard/catways/:id/reservations/add', verifierAuthentification, as
 
 // Route pour AJOUTER un nouveau catway (protégée par le videur)
 app.post('/dashboard/add', verifierAuthentification, async (req, res) => {
-    const Catway = require('./models/catway'); 
+    // const Catway = require('./models/catway'); 
     
     try {
         // 1. On rassemble les infos tapées dans le formulaire
@@ -338,7 +340,7 @@ app.post('/dashboard/add', verifierAuthentification, async (req, res) => {
 
 //  Afficher le formulaire de modification
 app.get('/dashboard/edit/:id', verifierAuthentification, async (req, res) => {
-    const Catway = require('./models/catway');
+    // const Catway = require('./models/catway');
     try {
         const catway = await Catway.findById(req.params.id).lean();
         res.render('edit-catway', { catway });
@@ -349,7 +351,7 @@ app.get('/dashboard/edit/:id', verifierAuthentification, async (req, res) => {
 
 //  Traiter la mise à jour (Action du formulaire)
 app.post('/dashboard/update/:id', verifierAuthentification, async (req, res) => {
-    const Catway = require('./models/catway');
+    // const Catway = require('./models/catway');
     try {
         await Catway.findByIdAndUpdate(req.params.id, {
             catwayState: req.body.catwayState
@@ -362,7 +364,7 @@ app.post('/dashboard/update/:id', verifierAuthentification, async (req, res) => 
 
 // Route pour supprimer un catway spécifique (Sécurisée et adaptée pour Fetch)
 app.delete('/dashboard/delete/:id', verifierAuthentification, async (req, res) => {
-    const Catway = require('./models/catway'); 
+    // const Catway = require('./models/catway'); 
     
     try {
         await Catway.findByIdAndDelete(req.params.id);
@@ -410,7 +412,7 @@ app.delete('/dashboard/delete/:id', verifierAuthentification, async (req, res) =
 
 // Route pour SUPPRIMER une réservation spécifique
 app.delete('/dashboard/reservations/delete/:id', verifierAuthentification, async (req, res) => {
-    const Reservation = require('./models/reservation');
+    // const Reservation = require('./models/reservation');
     try {
         await Reservation.findByIdAndDelete(req.params.id);
         console.log("Réservation annulée avec succès !");
