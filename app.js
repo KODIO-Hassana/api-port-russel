@@ -2,6 +2,7 @@
 const User = require('./models/user');
 const Catway = require('./models/catway'); 
 const Reservation = require('./models/reservation'); // 
+const connectDB = require('./config/database');
 
 require('dotenv').config();
 
@@ -29,24 +30,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fonction de protection (Middleware)
-const verifierAuthentification = (req, res, next) => {
-    const token = req.cookies.token; // On récupère le badge dans le cookie
+// const verifierAuthentification = (req, res, next) => {
+//     const token = req.cookies.token; // On récupère le badge dans le cookie
 
-    if (!token) {
-        // Pas de badge ? On renvoie vers une erreur ou la page de login
-        return res.status(401).send("Accès refusé : vous devez être connecté pour voir le dashboard.");
-    }
+//     if (!token) {
+//         // Pas de badge ? On renvoie vers une erreur ou la page de login
+//         return res.status(401).send("Accès refusé : vous devez être connecté pour voir le dashboard.");
+//     }
 
-    try {
-        // On vérifie si le badge est authentique avec ta phrase secrète du .env
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // On stocke les infos du user au cas où on en aurait besoin
-        next(); // Le badge est bon, on laisse passer à l'étape suivante !
-    } catch (error) {
-        // Badge truqué ou expiré
-        res.status(401).send("Session expirée ou invalide. Veuillez vous reconnecter.");
-    }
-};
+//     try {
+//         // On vérifie si le badge est authentique avec ta phrase secrète du .env
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         req.user = decoded; // On stocke les infos du user au cas où on en aurait besoin
+//         next(); // Le badge est bon, on laisse passer à l'étape suivante !
+//     } catch (error) {
+//         // Badge truqué ou expiré
+//         res.status(401).send("Session expirée ou invalide. Veuillez vous reconnecter.");
+//     }
+// };
+
+const verifierAuthentification = require('./middlewares/auth');
 
 const port = 3001;
 
@@ -57,25 +60,34 @@ app.use(cookieParser());
 
 // 5. IMPORTATION DES ROUTES
 const catwaysRoutes = require('./routes/catways');
-const reservationsRoutes = require('./routes/reservations');
+// const reservationsRoutes = require('./routes/reservations');
 const authRoutes = require('./routes/auth');
 
 const usersRoutes = require('./routes/users');
 app.use('/users', usersRoutes);
 
 // 6. DÉFINITION DES ROUTES DE L'API
-app.use('/catways', catwaysRoutes);
-app.use('/', reservationsRoutes);
-app.use('/auth', authRoutes);
+// 6. DÉFINITION DES ROUTES DE L'API
 
-// 7. CONNEXION À LA BASE DE DONNÉES MONGODB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('✅ Connexion à MongoDB réussie !');
-    })
-    .catch((error) => {
-        console.error('❌ Erreur de connexion à MongoDB :', error);
-    });
+// La route d'authentification reste ouverte (sinon on ne pourrait pas se connecter !)
+app.use('/auth', authRoutes); 
+
+// On place le videur devant les catways et les utilisateurs !
+app.use('/catways', verifierAuthentification, catwaysRoutes);
+app.use('/users', verifierAuthentification, usersRoutes);
+
+// app.use('/catways', catwaysRoutes);
+// // app.use('/', reservationsRoutes);
+// app.use('/auth', authRoutes);
+
+// // 7. CONNEXION À LA BASE DE DONNÉES MONGODB
+// mongoose.connect(process.env.MONGO_URI)
+//     .then(() => {
+//         console.log('✅ Connexion à MongoDB réussie !');
+//     })
+//     .catch((error) => {
+//         console.error('❌ Erreur de connexion à MongoDB :', error);
+//     });
 
 // // Remplace 'ma_base' par 'test' à la fin de l'URL avant le '?'
 // mongoose.connect('mongodb+srv://hassana:ikIzMAMmd5Kig2oy@cluster0.lk0mclq.mongodb.net/test')
@@ -436,6 +448,8 @@ app.use((err, req, res, next) => {
 
 
 // 10. DÉMARRAGE DU SERVEUR
+
+connectDB();
 app.listen(port, () => {
     console.log(`🚀 Serveur démarré sur http://localhost:${port}`);
 });
